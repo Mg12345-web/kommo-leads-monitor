@@ -35,10 +35,13 @@ def get_lost_leads():
         nome = lead.get("name", "Sem nome")
 
         telefone = ""
-        campos = lead.get("custom_fields_values", [])
-        for campo in campos:
-            if campo.get("field_name", "").lower() in ["telefone", "phone"]:
-                telefone = campo["values"][0]["value"]
+        telefone = ""
+campos = lead.get("custom_fields_values")
+if campos and isinstance(campos, list):
+    for campo in campos:
+        if campo.get("field_name", "").lower() in ["telefone", "phone"]:
+            telefone = campo["values"][0]["value"]
+            break
 
         motivo = lead.get("loss_reason", {}).get("name", "Sem motivo")
         dias_ate_perda = calcular_dias(lead.get("created_at"), lead.get("updated_at"))
