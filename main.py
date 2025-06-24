@@ -10,7 +10,7 @@ load_dotenv()
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 SUBDOMAIN = os.getenv("SUBDOMAIN")
 BASE_URL = f"https://{SUBDOMAIN}.kommo.com"
-SHEET_ID = os.getenv("SHEET_ID")  # coloque essa variável no Railway
+SHEET_ID = os.getenv("SHEET_ID")
 ABA = "Leads Perdidos"
 
 def calcular_dias(inicio, fim):
@@ -33,8 +33,7 @@ def get_lost_leads():
 
     for lead in data:
         nome = lead.get("name", "Sem nome")
-        
-        # Extrair telefone se houver
+
         telefone = ""
         campos = lead.get("custom_fields_values", [])
         for campo in campos:
@@ -48,17 +47,20 @@ def get_lost_leads():
         print(f"❌ {nome} | Motivo: {motivo}")
         dados_para_planilha.append([nome, telefone, motivo, dias_ate_perda, tempo_sem_resposta])
 
-    enviar_para_planilha(
-        sheet_id=SHEET_ID,
-        aba_nome=ABA,
-        dados=dados_para_planilha
-    )
+    if dados_para_planilha:
+        enviar_para_planilha(
+            sheet_id=SHEET_ID,
+            aba_nome=ABA,
+            dados=dados_para_planilha
+        )
+    else:
+        print("⚠️ Nenhum dado para enviar à planilha.")
 
 if __name__ == "__main__":
     while True:
         try:
             get_lost_leads()
-            sleep(300)  # roda a cada 5 minutos
+            sleep(300)
         except Exception as e:
             print("Erro:", e)
             sleep(60)
